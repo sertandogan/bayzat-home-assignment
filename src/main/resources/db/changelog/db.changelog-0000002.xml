@@ -1,0 +1,35 @@
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+    <changeSet id="11-10-2022 22:16" author="bayztracker">
+        <sql>CREATE TYPE statuses AS ENUM ('NEW','TRIGGERED', 'ACKED', 'CANCELLED')</sql>
+        <createTable tableName="alerts">
+            <column name="id" type="bigint">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="user_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="currency_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="target_price" type="float">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+            <column name="status" type="statuses">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addForeignKeyConstraint baseTableName="alerts" baseColumnNames="currency_id" constraintName="FK_alerts_currency"
+                                 referencedTableName="currencies"
+                                 referencedColumnNames="id"/>
+        <addForeignKeyConstraint baseTableName="alerts" baseColumnNames="user_id" constraintName="FK_alerts_user"
+                                 referencedTableName="users"
+                                 referencedColumnNames="id"/>
+        <createSequence sequenceName="seq_alert" startValue="100" incrementBy="50"/>
+    </changeSet>
+</databaseChangeLog>

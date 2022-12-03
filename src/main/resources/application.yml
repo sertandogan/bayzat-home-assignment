@@ -1,0 +1,36 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/bayztracker?stringtype=unspecified
+    username: db_user
+    password: 123qwe
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    open-in-view: false
+    show-sql: true
+    hibernate:
+      ddl-auto: none
+  liquibase:
+    change-log: classpath:/db/changelog/db.changelog-master.xml
+    enabled: true
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+
+server:
+  port: 8081
+
+scheduler:
+  fixed-delay: 30000
+  initial-delay: 30000
+
+  
+---
+spring:
+  datasource:
+    url: ${POSTGRES_HOST}?stringtype=unspecified
+    username: ${POSTGRES_USER}
+    password: ${POSTGRES_PASSWORD}
+
+  config:
+    activate:
+      on-profile: docker-compose

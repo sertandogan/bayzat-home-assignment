@@ -1,0 +1,60 @@
+version: "3.8"
+
+services:
+  postgres:
+    container_name: bayztracker_db
+    image: postgres
+    restart: unless-stopped
+    volumes:
+      - postgres:/data/postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-db_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-123qwe}
+      POSTGRES_DB: ${POSTGRES_DB:-bayztracker}
+      PGDATA: /data/postgres
+    networks:
+      - postgres
+
+  pgadmin_case:
+    container_name: pgadmin_case
+    image: dpage/pgadmin4
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=test@test.com
+      - PGADMIN_DEFAULT_PASSWORD=admin1234
+    restart: always
+    ports:
+      - "5050:80"
+    volumes:
+      - pgadmin_data:/root/.pgadmin
+    logging:
+      driver: none
+    networks:
+      - postgres
+
+  bayztracker_api:
+    container_name: bayztracker_api
+    environment:
+      SPRING_PROFILES_ACTIVE: docker-compose
+      POSTGRES_USER: ${POSTGRES_USER:-db_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-123qwe}
+      POSTGRES_HOST:  ${POSTGRES_HOST:-jdbc:postgresql://postgres:5432/bayztracker}
+    ports:
+      - 8081:8081
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      - postgres
+    command: --spring.profiles.active=docker-compose
+    networks:
+      - postgres
+
+networks:
+  postgres:
+    driver: bridge
+
+volumes:
+  postgres:
+  pgadmin_data:
